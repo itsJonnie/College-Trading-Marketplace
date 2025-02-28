@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { Item, User } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, HandshakeIcon } from "lucide-react";
 
 export default function ItemDetails() {
   const { id } = useParams();
@@ -39,7 +39,7 @@ export default function ItemDetails() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="aspect-[16/9] relative overflow-hidden rounded-lg">
-        <img 
+        <img
           src={item.imageUrl}
           alt={item.title}
           className="object-cover w-full h-full"
@@ -57,23 +57,32 @@ export default function ItemDetails() {
 
         <p className="text-lg text-muted-foreground">{item.description}</p>
 
-        {user && (
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Mail className="mr-2 h-4 w-4" />
-                  {user.email}
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Phone className="mr-2 h-4 w-4" />
-                  {user.phone}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <div className="space-y-4">
+          <Link href={`/items/${id}/offer`}>
+            <Button className="w-full" size="lg">
+              <HandshakeIcon className="mr-2 h-5 w-5" />
+              Make a Trade Offer
+            </Button>
+          </Link>
+
+          {user && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
+                <div className="space-y-3">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Mail className="mr-2 h-4 w-4" />
+                    {user.email}
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Phone className="mr-2 h-4 w-4" />
+                    {user.phone}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
