@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import CreateListing from "@/pages/create-listing";
+import CreateOffer from "@/pages/create-offer";
 import ItemDetails from "@/pages/item-details";
 import Navbar from "@/components/navbar";
 
@@ -17,6 +18,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/create" component={CreateListing} />
           <Route path="/items/:id" component={ItemDetails} />
+          <Route path="/items/:id/offer" component={CreateOffer} />
           <Route component={NotFound} />
         </Switch>
       </main>

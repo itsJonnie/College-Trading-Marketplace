@@ -1,4 +1,4 @@
-import { Item, InsertItem, User, InsertUser } from "@shared/schema";
+import { Item, InsertItem, User, InsertUser, TradeOffer, InsertTradeOffer } from "@shared/schema";
 
 export interface IStorage {
   // Items
@@ -6,24 +6,34 @@ export interface IStorage {
   getItem(id: number): Promise<Item | undefined>;
   getAllItems(): Promise<Item[]>;
   getItemsByCategory(category: string): Promise<Item[]>;
-  
+
   // Users
   createUser(user: InsertUser): Promise<User>;
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+
+  // Trade Offers
+  createTradeOffer(offer: InsertTradeOffer): Promise<TradeOffer>;
+  getTradeOffer(id: number): Promise<TradeOffer | undefined>;
+  getTradeOffersForItem(itemId: number): Promise<TradeOffer[]>;
+  updateTradeOfferStatus(id: number, status: string): Promise<TradeOffer>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private items: Map<number, Item>;
+  private tradeOffers: Map<number, TradeOffer>;
   private userId: number;
   private itemId: number;
+  private tradeOfferId: number;
 
   constructor() {
     this.users = new Map();
     this.items = new Map();
+    this.tradeOffers = new Map();
     this.userId = 1;
     this.itemId = 1;
+    this.tradeOfferId = 1;
   }
 
   async createItem(insertItem: InsertItem): Promise<Item> {
@@ -68,6 +78,38 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).find(
       (user) => user.username === username
     );
+  }
+
+  async createTradeOffer(insertOffer: InsertTradeOffer): Promise<TradeOffer> {
+    const id = this.tradeOfferId++;
+    const offer: TradeOffer = {
+      ...insertOffer,
+      id,
+      status: "pending",
+      createdAt: new Date(),
+    };
+    this.tradeOffers.set(id, offer);
+    return offer;
+  }
+
+  async getTradeOffer(id: number): Promise<TradeOffer | undefined> {
+    return this.tradeOffers.get(id);
+  }
+
+  async getTradeOffersForItem(itemId: number): Promise<TradeOffer[]> {
+    return Array.from(this.tradeOffers.values())
+      .filter(offer => offer.requestedItemId === itemId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async updateTradeOfferStatus(id: number, status: string): Promise<TradeOffer> {
+    const offer = await this.getTradeOffer(id);
+    if (!offer) {
+      throw new Error("Trade offer not found");
+    }
+    const updatedOffer = { ...offer, status };
+    this.tradeOffers.set(id, updatedOffer);
+    return updatedOffer;
   }
 }
 
